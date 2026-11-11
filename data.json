@@ -1,0 +1,90 @@
+[
+  {
+    "type": "car",
+    "name": "Mini Cabrio",
+    "plate": "GB336TR",
+    "reg": "2020-07-29",
+    "bought": "2020-07-29",
+    "services": [
+      "2022-05-30",
+      "2024-06-12",
+      "2026-07-03"
+    ],
+    "interval": 12,
+    "bolloD": 31,
+    "bolloM": 7,
+    "bolloCost": 355.17,
+    "insExp": "2026-12-01",
+    "insCo": "Prima",
+    "insCost": 517,
+    "insSusp": false,
+    "rev": "2028-07",
+    "value": 23000
+  },
+  {
+    "type": "bike",
+    "name": "Guzzi V7",
+    "plate": "EW05029",
+    "reg": "2021-05-08",
+    "bought": "2021-05-08",
+    "services": [
+      "2021-06-23",
+      "2023-06-20",
+      "2026-07-02"
+    ],
+    "interval": 12,
+    "bolloD": 1,
+    "bolloM": 6,
+    "bolloCost": 52.4,
+    "insExp": "2027-06-07",
+    "insCo": "Allianzdirect",
+    "insCost": 302,
+    "insSusp": false,
+    "rev": "2027-05",
+    "value": 6500
+  },
+  {
+    "type": "car",
+    "name": "Alfa Stelvio",
+    "plate": "GH340TH",
+    "reg": "2022-01-28",
+    "bought": "2022-04-19",
+    "services": [
+      "2022-12-14",
+      "2023-09-05",
+      "2024-07-16",
+      "2025-07-04",
+      "2026-06-08"
+    ],
+    "interval": 12,
+    "bolloD": 2,
+    "bolloM": 2,
+    "bolloCost": 496.62,
+    "insExp": "2027-05-18",
+    "insCo": "Prima",
+    "insCost": 327,
+    "insSusp": false,
+    "rev": "2028-01",
+    "value": 24000
+  },
+  {
+    "type": "bike",
+    "name": "MV Turismo Veloce",
+    "plate": "FN49400",
+    "reg": "2024-12-20",
+    "bought": "2025-10-24",
+    "services": [
+      "2025-10-23"
+    ],
+    "interval": 12,
+    "bolloD": 31,
+    "bolloM": 12,
+    "bolloCost": 0,
+    "insExp": "",
+    "insCo": "Prima",
+    "insCost": 940,
+    "insSusp": true,
+    "rev": "2028-12",
+    "value": 15000
+  }
+]

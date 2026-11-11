@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Garage deadlines</title>
+<style>
+:root{--bg:#eef1f3;--card:#fff;--ink:#14222b;--mute:#5d6d77;--line:#d5dce1;--blue:#16466a;--red:#c8372d;--amber:#b87b00;--amberbg:#fff3cf;--redbg:#fde6e3;--green:#2f7d5b;--greenbg:#e3f3ea;--field:#f6f8f9}
+@media(prefers-color-scheme:dark){:root{--bg:#0f171c;--card:#18242b;--ink:#e7eef2;--mute:#92a3ad;--line:#2b3b44;--blue:#7fb7e0;--red:#ff8a7e;--amber:#f2c230;--amberbg:#3a3010;--redbg:#42201c;--green:#6fd0a0;--greenbg:#173326;--field:#111b21}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 "Avenir Next","Segoe UI",system-ui,sans-serif;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
+main{max-width:1000px;margin:0 auto;padding:20px 16px 60px}
+header{display:flex;flex-wrap:wrap;gap:12px;align-items:end;justify-content:space-between;margin-bottom:18px}
+h1{font-size:30px;margin:0;letter-spacing:-.02em}
+h2{font-size:18px;margin:28px 0 10px}
+.sub{color:var(--mute);margin:2px 0 0}
+button,.btn{font:inherit;font-size:14px;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:8px;padding:7px 12px;cursor:pointer}
+button:hover{border-color:var(--blue)}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-offset:1px}
+.tools{display:flex;gap:8px;flex-wrap:wrap}
+.stats{display:flex;gap:10px;flex-wrap:wrap}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 14px;flex:1 1 150px}
+.stat b{display:block;font-size:22px}
+.stat span{color:var(--mute);font-size:13px}
+.up{background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.row{display:grid;grid-template-columns:92px 1fr auto;gap:12px;align-items:center;padding:10px 14px;border-top:1px solid var(--line)}
+.row:first-child{border-top:0}
+.days{font-weight:700;font-size:14px;text-align:center;border-radius:8px;padding:6px 4px}
+.ok{background:var(--greenbg);color:var(--green)}.soon{background:var(--amberbg);color:var(--amber)}.late{background:var(--redbg);color:var(--red)}
+.row .what{font-weight:600}.row .who{color:var(--mute);font-size:14px}
+.row .when{color:var(--mute);font-size:14px;text-align:right}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,440px),1fr));gap:14px}
+.veh{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px}
+.top{display:flex;gap:12px;align-items:center;margin-bottom:12px}
+.plate{display:inline-flex;align-items:stretch;border:2px solid var(--ink);border-radius:5px;overflow:hidden;background:#fff;color:#111;font:700 16px/1 ui-monospace,Menlo,Consolas,monospace;letter-spacing:.06em}
+.plate i{background:#1b4fa0;color:#fff;font-style:normal;font-size:9px;padding:6px 4px;display:flex;align-items:flex-end}
+.plate span{padding:6px 10px}
+.top input.name{font-size:18px;font-weight:700;border:0;background:transparent;padding:2px 0;width:100%;color:var(--ink)}
+.top small{color:var(--mute)}
+.f{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+label{display:block;font-size:13px;color:var(--mute)}
+input,select{font:inherit;font-size:15px;width:100%;margin-top:3px;padding:6px 8px;border:1px solid var(--line);border-radius:7px;background:var(--field);color:var(--ink)}
+input[type=checkbox]{width:auto;margin:0 6px 0 0;vertical-align:middle}
+.sec{font-weight:600;font-size:14px;margin:14px 0 6px;padding-top:10px;border-top:1px solid var(--line)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
+.chip{background:var(--field);border:1px solid var(--line);border-radius:99px;padding:3px 4px 3px 10px;font-size:14px;display:inline-flex;gap:4px;align-items:center}
+.chip button{border:0;background:none;padding:0 6px;color:var(--mute);font-size:16px;line-height:1}
+.add{display:flex;gap:8px}.add input{margin:0}
+.banner{background:var(--amberbg);color:var(--amber);border-radius:10px;padding:10px 14px;margin-bottom:12px;font-size:14px}
+.empty{padding:16px;color:var(--mute)}
+@media(max-width:520px){.row{grid-template-columns:78px 1fr}.row .when{grid-column:2;text-align:left}}
+</style>
+</head>
+<body>
+<main>
+<header>
+  <div><h1>Garage deadlines</h1><p class="sub" id="today"></p></div>
+  <div class="tools">
+    <button id="exp">Download data.json</button>
+    <button id="imp">Import file</button>
+    <button id="rst">Discard my edits</button>
+    <input type="file" id="file" accept="application/json" hidden>
+  </div>
+</header>
+<div class="banner" id="draft" hidden>You have unsaved edits on this device. Tap <b>Download data.json</b> and upload it to your GitHub repo to keep them on all devices.</div>
+<div class="stats" id="stats"></div>
+<h2>Coming up</h2>
+<div class="up" id="up"></div>
+<h2>Vehicles</h2>
+<div class="grid" id="veh"></div>
+</main>
+<script>
+var DEFAULT=[
+{type:'car',name:'Mini Cabrio',plate:'GB336TR',reg:'2020-07-29',bought:'2020-07-29',services:['2022-05-30','2024-06-12','2026-07-03'],interval:12,bolloD:31,bolloM:7,bolloCost:355.17,insExp:'2026-12-01',insCo:'Prima',insCost:517,insSusp:false,rev:'2028-07',value:23000},
+{type:'bike',name:'Guzzi V7',plate:'EW05029',reg:'2021-05-08',bought:'2021-05-08',services:['2021-06-23','2023-06-20','2026-07-02'],interval:12,bolloD:1,bolloM:6,bolloCost:52.40,insExp:'2027-06-07',insCo:'Allianzdirect',insCost:302,insSusp:false,rev:'2027-05',value:6500},
+{type:'car',name:'Alfa Stelvio',plate:'GH340TH',reg:'2022-01-28',bought:'2022-04-19',services:['2022-12-14','2023-09-05','2024-07-16','2025-07-04','2026-06-08'],interval:12,bolloD:2,bolloM:2,bolloCost:496.62,insExp:'2027-05-18',insCo:'Prima',insCost:327,insSusp:false,rev:'2028-01',value:24000},
+{type:'bike',name:'MV Turismo Veloce',plate:'FN49400',reg:'2024-12-20',bought:'2025-10-24',services:['2025-10-23'],interval:12,bolloD:31,bolloM:12,bolloCost:0,insExp:'',insCo:'Prima',insCost:940,insSusp:true,rev:'2028-12',value:15000}
+];
+var KEY='garage-draft-v1',data=JSON.parse(JSON.stringify(DEFAULT));
+function draft(){try{var x=localStorage.getItem(KEY);return x?JSON.parse(x):null}catch(e){return null}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(data))}catch(e){}}
+function init(){var d=draft();if(d){data=d;render();return}
+fetch('data.json',{cache:'no-store'}).then(function(r){if(!r.ok)throw 0;return r.json()}).then(function(j){if(Array.isArray(j))data=j;render()}).catch(function(){render()})}
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+var MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
+var now=new Date(),T=new Date(now.getFullYear(),now.getMonth(),now.getDate());
+function pd(s){var p=s.split('-');return new Date(+p[0],+p[1]-1,+p[2]||1)}
+function fmt(d){return d.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})}
+function eur(n){return Number(n||0).toLocaleString('en-GB',{style:'currency',currency:'EUR',maximumFractionDigits:2})}
+function dl(d){return Math.round((d-T)/864e5)}
+function deadlines(){
+  var out=[];
+  data.forEach(function(v,i){
+    var nm=v.name||'Vehicle';
+    if(v.insExp&&!v.insSusp)out.push({v:nm,what:'Insurance expires',d:pd(v.insExp),note:v.insCo});
+    if(v.bolloD&&v.bolloM&&v.bolloCost>0){var d=new Date(T.getFullYear(),v.bolloM-1,v.bolloD);if(d<T)d=new Date(T.getFullYear()+1,v.bolloM-1,v.bolloD);out.push({v:nm,what:'Road tax (bollo)',d:d,note:eur(v.bolloCost)})}
+    if(v.rev){var p=v.rev.split('-');out.push({v:nm,what:'Inspection (revisione)',d:new Date(+p[0],+p[1],0),note:'by end of month'})}
+    if(v.services.length){var l=pd(v.services.slice().sort().pop()),d=new Date(l.getFullYear(),l.getMonth()+(+v.interval||12),l.getDate());out.push({v:nm,what:'Next service',d:d,note:'last: '+fmt(l)})}
+  });
+  return out.sort(function(a,b){return a.d-b.d});
+}
+function cls(n){return n<0?'late':n<=30?'soon':'ok'}
+function dtxt(n){return n<0?Math.abs(n)+' d overdue':n===0?'Today':n+' days'}
+function render(){
+  document.getElementById('draft').hidden=!draft();
+  document.getElementById('today').textContent='Today is '+T.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  var dls=deadlines(),late=dls.filter(function(x){return dl(x.d)<0}).length,soon=dls.filter(function(x){var n=dl(x.d);return n>=0&&n<=30}).length;
+  var yearly=data.reduce(function(s,v){return s+(+v.bolloCost||0)+(v.insSusp?0:(+v.insCost||0))},0),val=data.reduce(function(s,v){return s+(+v.value||0)},0);
+  document.getElementById('stats').innerHTML='<div class="stat"><b>'+late+'</b><span>overdue</span></div><div class="stat"><b>'+soon+'</b><span>due in 30 days</span></div><div class="stat"><b>'+eur(yearly)+'</b><span>tax + insurance per year</span></div><div class="stat"><b>'+eur(val)+'</b><span>total value</span></div>';
+  document.getElementById('up').innerHTML=dls.length?dls.slice(0,10).map(function(x){var n=dl(x.d);return '<div class="row"><div class="days '+cls(n)+'">'+dtxt(n)+'</div><div><div class="what">'+esc(x.what)+'</div><div class="who">'+esc(x.v)+(x.note?' · '+esc(x.note):'')+'</div></div><div class="when">'+fmt(x.d)+'</div></div>'}).join(''):'<div class="empty">No deadlines yet. Fill in a vehicle below.</div>';
+  document.getElementById('veh').innerHTML=data.map(vehHTML).join('');
+}
+function fld(i,k,label,type,extra){var v=data[i][k];return '<label>'+label+'<input type="'+type+'" data-i="'+i+'" data-k="'+k+'" value="'+esc(v)+'" '+(extra||'')+'></label>'}
+function vehHTML(v,i){
+  var mo='<label>Bollo month<select data-i="'+i+'" data-k="bolloM">'+MONTHS.map(function(m,j){return '<option value="'+(j+1)+'"'+(v.bolloM==j+1?' selected':'')+'>'+m+'</option>'}).join('')+'</select></label>';
+  var sv=v.services.slice().sort();
+  return '<section class="veh"><div class="top"><div class="plate"><i>I</i><span>'+esc(v.plate||'—')+'</span></div><div style="flex:1"><input class="name" aria-label="Name" data-i="'+i+'" data-k="name" value="'+esc(v.name)+'"><small>'+(v.type==='bike'?'Motorbike':'Car')+'</small></div></div>'
+  +'<div class="f">'+fld(i,'plate','Plate','text')+fld(i,'value','Value 2026 (€)','number','step="500"')+fld(i,'reg','Registered','date')+fld(i,'bought','Purchased','date')+'</div>'
+  +'<div class="sec">Services</div><div class="chips">'+(sv.length?sv.map(function(s,j){return '<span class="chip">'+fmt(pd(s))+'<button aria-label="Remove service" data-rm="'+i+'" data-d="'+s+'">×</button></span>'}).join(''):'<span class="who">None logged</span>')+'</div>'
+  +'<div class="add"><input type="date" id="sd'+i+'" aria-label="Service date"><button data-add="'+i+'">Add service</button></div>'
+  +'<div class="f" style="margin-top:10px">'+fld(i,'interval','Service every (months)','number','min="1"')+'<span></span></div>'
+  +'<div class="sec">Road tax</div><div class="f">'+fld(i,'bolloD','Bollo day','number','min="1" max="31"')+mo+fld(i,'bolloCost','Cost (€, 0 if none)','number','step="0.01"')+'</div>'
+  +'<div class="sec">Insurance</div><div class="f">'+fld(i,'insCo','Company','text')+fld(i,'insCost','Last cost (€)','number')+fld(i,'insExp','Expires','date')+'<label style="align-self:end;padding-bottom:8px"><input type="checkbox" data-i="'+i+'" data-k="insSusp"'+(v.insSusp?' checked':'')+'>Suspended</label></div>'
+  +'<div class="sec">Inspection</div><div class="f">'+fld(i,'rev','Due month','month')+'</div></section>';
+}
+document.addEventListener('change',function(e){
+  var t=e.target,i=t.dataset.i,k=t.dataset.k;if(i==null||!k)return;
+  var v=t.type==='checkbox'?t.checked:t.value;
+  if(t.type==='number'&&k!=='bolloCost')v=+v;if(k==='bolloCost')v=+v||0;if(k==='bolloM')v=+v;
+  data[i][k]=v;save();render();
+});
+document.addEventListener('click',function(e){
+  var t=e.target;
+  if(t.dataset.add!=null){var i=t.dataset.add,d=document.getElementById('sd'+i).value;if(d&&data[i].services.indexOf(d)<0){data[i].services.push(d);save();render()}}
+  if(t.dataset.rm!=null){var s=data[t.dataset.rm].services;s.splice(s.indexOf(t.dataset.d),1);save();render()}
+});
+document.getElementById('exp').onclick=function(){var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}));a.download='data.json';a.click()};
+document.getElementById('imp').onclick=function(){document.getElementById('file').click()};
+document.getElementById('file').onchange=function(e){var f=e.target.files[0];if(!f)return;var r=new FileReader();r.onload=function(){try{var d=JSON.parse(r.result);if(Array.isArray(d)){data=d;save();render()}else alert('That file is not a garage backup.')}catch(x){alert('That file is not a garage backup.')}};r.readAsText(f)};
+document.getElementById('rst').onclick=function(){if(confirm('Discard edits and reload data.json?')){try{localStorage.removeItem(KEY)}catch(e){}data=JSON.parse(JSON.stringify(DEFAULT));init()}};
+init();
+</script>
+</body>
+</html>
